@@ -1,5 +1,15 @@
+//function to return a random speed
+var newSpeed = function () {
+    return 150 + Math.random() * 230
+    }
+
+var newLane = function () {
+    return 55 + (Math.floor(Math.random() * 3) * 83)
+    }
+    
+    
 // Enemies our player must avoid
-var Enemy = function(loc, vel) {
+var Enemy = function() {
     // Variables applied to each of our instances go here,
     // we've provided one for you to get started
 
@@ -9,15 +19,15 @@ var Enemy = function(loc, vel) {
     
     // the location of the bug when it's rendered; the starting position 
     // will be determined when the enemies are initiated. 
-    this.x = loc[0];
-    this.y = loc[1];
-    
+    this.x = Math.random()*505;
+    this.y = newLane();
+    console.log(this.x)
+    console.log(this.y)
     // the speed of movement varies depending on which lane the bug is on,
     // so this needs to be determined at the start. this will be applied to the 
     // x coord of the location when the update function is called.
-    this.vel = vel;
-    
-    
+    this.vel = newSpeed();
+        
 }
 
 // Update the enemy's position, required method for game
@@ -34,10 +44,13 @@ Enemy.prototype.update = function(dt) {
         var move = this.vel * dt;
     }
     // movement gets added to the x position, however if this results in the bug 
-    // moving off the screen, it should go back to the other side. 
+    // moving off the screen, it should go back to the other side, and choose
+    // a random lane to start in. It should also change it's speed to between 150 and 350
     this.x = this.x + move;
     if (this.x > 505) {
         this.x = -101;
+        this.y = newLane()
+        this.vel = 120 + Math.random() * 200 
     }
 }
 
@@ -69,7 +82,10 @@ Player.prototype.handleInput = function() {
 // Place the player object in a variable called player
 
 var allEnemies = [];
-allEnemies.push(new Enemy([0, 300], 100));
+
+allEnemies.push(new Enemy()); //test bug
+allEnemies.push(new Enemy());
+allEnemies.push(new Enemy());
 
 // when instantiating the enemies, they should be given a set value from one of the 3 lanes
 // for y, and a random value between 0 and canvas.width for their starting point.
