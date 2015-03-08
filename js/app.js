@@ -1,12 +1,16 @@
 // initiating some simple variables to allow tweaking and tailoring, and also to ensure precision in placing sprites
 
+var boardSize = {x:8, y:11}; //Important: for all the placing of sprites the board is effectively 10.
+
 var squareHeight = 83,
     spriteZero = -28,
     squareWidth = 101,
     charMargin = 20;
-//start position for any player (not currently used)
 
-// this is a simple object that keeps track of scores, enables a win condition etc. The player resets itself when
+var startX = Math.floor(boardSize.x / 2) * squareWidth;
+var startY = spriteZero + (squareHeight * (boardSize.y-2));
+
+// this is a simple object that keeps track of scores, enables a win condition etc.
 var score = {
     points: 0,
     message: "",
@@ -25,18 +29,18 @@ var score = {
         }
     },
     render: function() {
-        ctx.font = "30px Arial";
-        ctx.fillText(score.message, 20, 550);
-        ctx.fillText(score.points, 450, 550);
-        ctx.strokeText(score.message, 20, 550);
-        ctx.strokeText(score.points, 450, 550);
+        ctx.font = "700 30px Arial";
+        ctx.fillStyle = "violet";
+        ctx.lineWidth = 2;
+        ctx.fillText(score.message, 20, 750);
+        ctx.fillText(score.points, 753, 750);
+        ctx.strokeText(score.message, 20, 750);
+        ctx.strokeText(score.points, 753, 750);
     }
 }
 
 
-console.log("check");
-
-var startPosPlayer = [2 * squareWidth, spriteZero + squareHeight * 5]
+// console.log("check1");
 
 //function to return a random speed
 var newSpeed = function () {
@@ -51,8 +55,8 @@ var newLane = function () {
 // the drawing of the board and movement of the pieces is determined by the width of the images (101) and height of the rows (83).
 // in addition, to get the pieces to land correctly on the squares, they need to have a y offset of -28 compared to the location of the squares.
 
+// console.log("check2");
 
-console.log("check2");
 // Enemies our player must avoid
 var Enemy = function() {
     // Variables applied to each of our instances go here,
@@ -64,7 +68,7 @@ var Enemy = function() {
     
     // the location of the bug when it's rendered; the starting position 
     // will be determined when the enemies are initiated. 
-    this.x = Math.random()*505;
+    this.x = Math.random()*808;
     this.y = newLane();
     console.log(this.x);
     console.log(this.y);
@@ -74,7 +78,7 @@ var Enemy = function() {
         
 }
 
-console.log("check3");
+// console.log("check3");
 
 // Update the enemy's position, required method for game
 // Parameter: dt, a time delta between ticks
@@ -93,14 +97,14 @@ Enemy.prototype.update = function(dt) {
     // moving off the screen, it should go back to the other side, and choose
     // a random lane to start in. It should also change it's speed to between 150 and 350
     this.x = this.x + move;
-    if (this.x > 505) {
+    if (this.x > 808) {
         this.x = -101;
         this.y = newLane()
         this.vel = 120 + Math.random() * 200 
     }
 }
 
-console.log("check4");
+// console.log("check4");
 
 // Draw the enemy on the screen, required method for game
 Enemy.prototype.render = function() {
@@ -118,8 +122,8 @@ Enemy.prototype.render = function() {
 var Player = function() {
 
     this.sprite = 'images/char-horn-girl.png';
-    this.x = 2*squareWidth;
-    this.y = spriteZero + squareHeight * 5; 
+    this.x = startX;
+    this.y = startY; 
 
     }
     
@@ -151,8 +155,8 @@ Player.prototype.update = function() {
     )*/
         if (this.y < 0) {
             score.increase();
-            this.x = 2*squareWidth;
-            this.y = spriteZero + squareHeight * 5; 
+            this.x = startX;
+            this.y = startY; 
         }
     };
 
@@ -160,10 +164,10 @@ console.log("check6");
 
     // handleInput adds or subtracts from x and y based on input, but also will not let the sprite move off the board.
 Player.prototype.handleInput = function(keystroke) {
-    if (keystroke == 'up' && this.y > -28) {this.y = this.y - 83};
-    if (keystroke == 'down' && this.y < 387) {this.y = this.y + 83};
+    if (keystroke == 'up' && this.y > spriteZero) {this.y = this.y - 83};
+    if (keystroke == 'down' && this.y < 719) {this.y = this.y + 83};
     if (keystroke == 'left' && this.x > 0) {this.x = this.x - 101};
-    if (keystroke == 'right' && this.x < 101*4) {this.x = this.x + 101};
+    if (keystroke == 'right' && this.x < (squareWidth * 7)) {this.x = this.x + 101};
     console.log("Player");
     console.log(this.x);
     console.log(this.y);
@@ -171,6 +175,8 @@ Player.prototype.handleInput = function(keystroke) {
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
 // Place the player object in a variable called player
+
+console.log("check7");
 
 var allEnemies = [];
 
@@ -184,6 +190,8 @@ allEnemies.push(new Enemy());
 // of enemies moving together, and they can overrun each other.
 var player = new Player();
 
+console.log("check8");
+
 // This listens for key presses and sends the keys to your
 // Player.handleInput() method. You don't need to modify this.
 document.addEventListener('keyup', function(e) {
@@ -193,18 +201,40 @@ document.addEventListener('keyup', function(e) {
         39: 'right',
         40: 'down'
     };
-
+    console.log(e.keyCode);
     player.handleInput(allowedKeys[e.keyCode]);
 });
 
+// this was necessary because trying to put a this.y inside a allEnemies.forEach results in the this referring to allEnemies. Instead,
+// this is called during the allEnemies check so that it can refer to the enemy and the player directly.
 var collisionCheck = function(enemy, player) {
     if (player.y == enemy.y) {
         // console.log("equal y " + enemy.y);
         if ((player.x < enemy.x + squareWidth - charMargin) && (player.x > enemy.x - squareWidth + charMargin)) {
             // console.log("equal x");
-            player.x = 2*squareWidth;
-            player.y = spriteZero + squareHeight * 5; 
+            player.x = startX;
+            player.y = startY; 
             score.decrease();
         }
     }
 }
+
+/* Addtionnal features:
+
+1. player select screen
+    to do this, the reset() function would need to be used. draw a background, then draw the 5 characters, simplest way would be to label them with numbers. would need to 
+    add additional keybind handling, which would then initiate a Player object with the correct .sprite value. Load sprite image in this step rather than in init...?
+2. Collect gems, use special abilities
+    Gems would need to be a special Gem object to handle placing, collecting, rendering. But different abilities... 
+    - teleport gem
+    - double point gem
+    - shield gem
+    - ghost gem
+3. Lives instead of negative points
+    simple enough. Random stars would give extra lives potentially?
+4. larger more complex field
+    2 sets of lanes, bugs go in different directions. minimum number of bugs on each side
+5. impassible objects
+    rocks - place in a central lane so you don't have to worry about the bugs moving past them
+    
+    */
