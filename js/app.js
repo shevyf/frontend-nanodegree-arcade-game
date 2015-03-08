@@ -1,3 +1,16 @@
+// initiating some simple variables to allow tweaking and tailoring, and also to ensure precision in placing sprites
+
+var squareHeight = 83,
+    spriteZero = -28,
+    squareWidth = 101,
+    charMargin = 20,
+    score = 0;
+//start position for any player (not currently used)
+
+console.log("check");
+
+var startPosPlayer = [2 * squareWidth, spriteZero + squareHeight * 5]
+
 //function to return a random speed
 var newSpeed = function () {
     return 150 + Math.random() * 230
@@ -5,12 +18,14 @@ var newSpeed = function () {
 
 //funtion to return random lane
 var newLane = function () {
-    return 55 + (Math.floor(Math.random() * 3) * 83)
+    return spriteZero + squareHeight + (Math.floor(Math.random() * 3) * squareHeight)
     }
 
-//start position for any player (not currently used)
-var startPosPlayer = [505/2 - 50, 55 + 83*4]
-    
+// the drawing of the board and movement of the pieces is determined by the width of the images (101) and height of the rows (83).
+// in addition, to get the pieces to land correctly on the squares, they need to have a y offset of -28 compared to the location of those pieces.
+
+
+console.log("check2");  
 // Enemies our player must avoid
 var Enemy = function() {
     // Variables applied to each of our instances go here,
@@ -24,14 +39,16 @@ var Enemy = function() {
     // will be determined when the enemies are initiated. 
     this.x = Math.random()*505;
     this.y = newLane();
-    // console.log(this.x);
-    // console.log(this.y);
+    console.log(this.x);
+    console.log(this.y);
     // the speed of movement is randomised using the newSpeed function. The velocity will be applied to the 
     // x coord of the location when the update function is called.
     this.vel = newSpeed();
         
 }
-\`   
+
+console.log("check3");
+
 // Update the enemy's position, required method for game
 // Parameter: dt, a time delta between ticks
 Enemy.prototype.update = function(dt) {
@@ -56,6 +73,8 @@ Enemy.prototype.update = function(dt) {
     }
 }
 
+console.log("check4");
+
 // Draw the enemy on the screen, required method for game
 Enemy.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
@@ -67,25 +86,46 @@ Enemy.prototype.render = function() {
 
 // player always starts in the same place, but that location 
 // changes so it can't be part of the prototype object.
-// it is rendered the same way as the Enemy, and 
+// it is rendered the same way as the Enemy, but I don't think 
+// that's a good enough reason to make it a subclass.
 var Player = function() {
 
     this.sprite = 'images/char-horn-girl.png';
-    this.x = 2*101;
-    this.y = 387;
-    
+    this.x = 2*squareWidth;
+    this.y = spriteZero + squareHeight * 5; 
+
     }
+    
+console.log("check5");
     
 Player.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
     }
     
     // check for collisions and winning; movement is
-    // handled by handleInput. Need to check for win before render or 
-    // the sprite's hair gets printed over the water forever
+    // handled by handleInput. Sprite is narrower than bug; need to compensate for that when measuring collision.
+    // problem: if i try to use allEnemies.forEach, suddenly this refers to allEnemies instead of the player
+    // Do I solve this by putting the update function in the enemy update, or do I write a seperate collision function? Can I pass this as an arguement to a function?
+    // probably best to have a collision function in the engine and apply it as Collision(enemy.y, player.y) under the general update.
 Player.prototype.update = function() {
-    return null
-    }
+    /* allEnemies.forEach(function(enemy) {
+        // console.log(this.y);
+        if (this.y == enemy.y) {
+            // console.log("equal y " + enemy.y);
+            if ((this.x < enemy.x + squareWidth - charMargin) && (this.x > enemy.x - squareWidth + charMargin)) {
+                // console.log("equal x");
+                this.x = 2*squareWidth;
+                this.y = spriteZero + squareHeight * 5; 
+                score += 1;
+                console.log(score);
+                }
+            }
+        }
+    )*/
+        return null
+    };
+
+console.log("check6");
 
     // handleInput adds or subtracts from x and y based on input, but also will not let the sprite move off the board.
 Player.prototype.handleInput = function(keystroke) {
@@ -93,6 +133,9 @@ Player.prototype.handleInput = function(keystroke) {
     if (keystroke == 'down' && this.y < 387) {this.y = this.y + 83};
     if (keystroke == 'left' && this.x > 0) {this.x = this.x - 101};
     if (keystroke == 'right' && this.x < 101*4) {this.x = this.x + 101};
+    console.log("Player");
+    console.log(this.x);
+    console.log(this.y);
     }
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
@@ -122,3 +165,16 @@ document.addEventListener('keyup', function(e) {
 
     player.handleInput(allowedKeys[e.keyCode]);
 });
+
+var collisionCheck = function(enemy, player) {
+    if (player.y == enemy.y) {
+        // console.log("equal y " + enemy.y);
+        if ((player.x < enemy.x + squareWidth - charMargin) && (player.x > enemy.x - squareWidth + charMargin)) {
+            // console.log("equal x");
+            player.x = 2*squareWidth;
+            player.y = spriteZero + squareHeight * 5; 
+            score += 1;
+            console.log(score);
+        }
+    }
+}

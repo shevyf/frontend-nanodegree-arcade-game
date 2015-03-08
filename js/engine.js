@@ -91,10 +91,11 @@ var Engine = (function(global) {
      * render methods.
      */
     function updateEntities(dt) {
+        player.update();
         allEnemies.forEach(function(enemy) {
             enemy.update(dt);
+            collisionCheck(enemy, player);
         });
-        player.update();
     }
 
     /* This function initially draws the "game level", it will then call
@@ -108,7 +109,7 @@ var Engine = (function(global) {
          * for that particular row of the game level.
          */
         var rowImages = [
-                'images/water-block.png',
+                'images/water-block.png',   // added to fill out the top of the canvas and prevent hat-stamping
                 'images/water-block.png',   // Top row is water
                 'images/stone-block.png',   // Row 1 of 3 of stone
                 'images/stone-block.png',   // Row 2 of 3 of stone
@@ -133,7 +134,7 @@ var Engine = (function(global) {
                  * so that we get the benefits of caching these images, since
                  * we're using them over and over.
                  */
-                ctx.drawImage(Resources.get(rowImages[row]), col * 101, (row * 83)-83);
+                ctx.drawImage(Resources.get(rowImages[row]), col * 101, (row * 83)-83); // minor change to provide a top row that reaches off the top of the canvas.
             }
         }
 
