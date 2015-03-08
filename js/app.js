@@ -8,7 +8,7 @@ var newLane = function () {
     return 55 + (Math.floor(Math.random() * 3) * 83)
     }
 
-//start position for any player
+//start position for any player (not currently used)
 var startPosPlayer = [505/2 - 50, 55 + 83*4]
     
 // Enemies our player must avoid
@@ -24,15 +24,14 @@ var Enemy = function() {
     // will be determined when the enemies are initiated. 
     this.x = Math.random()*505;
     this.y = newLane();
-    console.log(this.x)
-    console.log(this.y)
-    // the speed of movement varies depending on which lane the bug is on,
-    // so this needs to be determined at the start. this will be applied to the 
+    // console.log(this.x);
+    // console.log(this.y);
+    // the speed of movement is randomised using the newSpeed function. The velocity will be applied to the 
     // x coord of the location when the update function is called.
     this.vel = newSpeed();
         
 }
-
+\`   
 // Update the enemy's position, required method for game
 // Parameter: dt, a time delta between ticks
 Enemy.prototype.update = function(dt) {
@@ -44,7 +43,7 @@ Enemy.prototype.update = function(dt) {
     // need to make sure a value is passed here or else undefined will be returned.
     var move = this.vel;
     if (dt != null) {
-        var move = this.vel * dt;
+        var move = this.vel * dt; // not yet implemented dt so this will help me compensate for that.
     }
     // movement gets added to the x position, however if this results in the bug 
     // moving off the screen, it should go back to the other side, and choose
@@ -71,7 +70,7 @@ Enemy.prototype.render = function() {
 // it is rendered the same way as the Enemy, and 
 var Player = function() {
 
-    this.sprite = 'images/char-boy.png';
+    this.sprite = 'images/char-horn-girl.png';
     this.x = 2*101;
     this.y = 387;
     
@@ -81,17 +80,19 @@ Player.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
     }
     
-    // check for collisions, winning and going off the side of the screen; movement is
-    // handled by handleInput.
+    // check for collisions and winning; movement is
+    // handled by handleInput. Need to check for win before render or 
+    // the sprite's hair gets printed over the water forever
 Player.prototype.update = function() {
     return null
     }
 
+    // handleInput adds or subtracts from x and y based on input, but also will not let the sprite move off the board.
 Player.prototype.handleInput = function(keystroke) {
-    if (keystroke == 'up') {this.y = this.y - 83};
-    if (keystroke == 'down') {this.y = this.y + 83};
-    if (keystroke == 'left') {this.x = this.x - 101};
-    if (keystroke == 'right') {this.x = this.x + 101};
+    if (keystroke == 'up' && this.y > -28) {this.y = this.y - 83};
+    if (keystroke == 'down' && this.y < 387) {this.y = this.y + 83};
+    if (keystroke == 'left' && this.x > 0) {this.x = this.x - 101};
+    if (keystroke == 'right' && this.x < 101*4) {this.x = this.x + 101};
     }
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
