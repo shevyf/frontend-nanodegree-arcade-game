@@ -40,45 +40,52 @@ var score = {
 }
 
 
-// console.log("check1");
+console.log("check1");
 
 //function to return a random speed
-var newSpeed = function () {
-    return 150 + Math.random() * 230
+var newSpeed = function (direction) {
+    return (150 + Math.random() * 230) * direction //direction shoulld be 1 for right and -1 for left
     }
 
 //funtion to return random lane
-var newLane = function () {
-    return spriteZero + squareHeight + (Math.floor(Math.random() * 3) * squareHeight)
+var newLane = function (lanes) {
+    if (lanes == "top") {
+        return spriteZero + squareHeight + (Math.floor(Math.random() * 3) * squareHeight)
+    } else { return spriteZero + squareHeight + ((Math.floor(Math.random() * 3) + 4) * squareHeight)
     }
+}
 
 // the drawing of the board and movement of the pieces is determined by the width of the images (101) and height of the rows (83).
 // in addition, to get the pieces to land correctly on the squares, they need to have a y offset of -28 compared to the location of the squares.
 
-// console.log("check2");
+console.log("check2");
 
 // Enemies our player must avoid
-var Enemy = function() {
+var Enemy = function(lanes, direction) {
     // Variables applied to each of our instances go here,
     // we've provided one for you to get started
 
+    this.lanes = lanes;
+    this.direction = direction;
+    
+    
     // The image/sprite for our enemies, this uses
     // a helper we've provided to easily load images
-    this.sprite = 'images/enemy-bug.png';
+    this.sprite = 'images/enemy-bug-' + this.lanes + ".png";
     
     // the location of the bug when it's rendered; the starting position 
     // will be determined when the enemies are initiated. 
     this.x = Math.random()*808;
-    this.y = newLane();
+    this.y = newLane(this.lanes);
     console.log(this.x);
     console.log(this.y);
     // the speed of movement is randomised using the newSpeed function. The velocity will be applied to the 
     // x coord of the location when the update function is called.
-    this.vel = newSpeed();
+    this.vel = newSpeed(this.direction);
         
-}
+};
 
-// console.log("check3");
+console.log("check3");
 
 // Update the enemy's position, required method for game
 // Parameter: dt, a time delta between ticks
@@ -99,16 +106,24 @@ Enemy.prototype.update = function(dt) {
     this.x = this.x + move;
     if (this.x > 808) {
         this.x = -101;
-        this.y = newLane()
-        this.vel = 120 + Math.random() * 200 
+        this.y = newLane(this.lanes);
+        this.vel = newSpeed(this.direction) 
+    };
+    if (this.x < -101) {
+        this.x = 808;
+        this.y = newLane(this.lanes);
+        this.vel = newSpeed(this.direction) 
     }
 }
 
-// console.log("check4");
+console.log("check4");
 
 // Draw the enemy on the screen, required method for game
 Enemy.prototype.render = function() {
+    ctx.save();
+    // ctx.scale(this.direction, 1);
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+    ctx.restore()
 }
 
 // Now write your own player class
@@ -180,9 +195,16 @@ console.log("check7");
 
 var allEnemies = [];
 
-allEnemies.push(new Enemy()); 
-allEnemies.push(new Enemy());
-allEnemies.push(new Enemy());
+for (i = 0; i < 4; i++) { 
+    allEnemies.push(new Enemy("top", 1)); 
+    allEnemies.push(new Enemy("bottom", -1));
+};
+
+// allEnemies.push(new Enemy("top", 1)); 
+// allEnemies.push(new Enemy("top", 1)); 
+
+// allEnemies.push(new Enemy("bottom", -1));
+// allEnemies.push(new Enemy("bottom", -1));
 
 // when instantiating the enemies, they should be given a set value from one of the 3 lanes
 // for y, and a random value between 0 and canvas.width for their starting point.
