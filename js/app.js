@@ -3,10 +3,13 @@ var newSpeed = function () {
     return 150 + Math.random() * 230
     }
 
+//funtion to return random lane
 var newLane = function () {
     return 55 + (Math.floor(Math.random() * 3) * 83)
     }
-    
+
+//start position for any player
+var startPosPlayer = [505/2 - 50, 55 + 83*4]
     
 // Enemies our player must avoid
 var Enemy = function() {
@@ -62,20 +65,33 @@ Enemy.prototype.render = function() {
 // Now write your own player class
 // This class requires an update(), render() and
 // a handleInput() method.
-var Player = function(loc) {
-    this.loc = loc;
+
+// player always starts in the same place, but that location 
+// changes so it can't be part of the prototype object.
+// it is rendered the same way as the Enemy, and 
+var Player = function() {
+
+    this.sprite = 'images/char-boy.png';
+    this.x = 2*101;
+    this.y = 387;
+    
     }
     
 Player.prototype.render = function() {
-    return null
+    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
     }
     
-Player.prototype.update = function(dt) {
+    // check for collisions, winning and going off the side of the screen; movement is
+    // handled by handleInput.
+Player.prototype.update = function() {
     return null
     }
 
-Player.prototype.handleInput = function() {
-    return null
+Player.prototype.handleInput = function(keystroke) {
+    if (keystroke == 'up') {this.y = this.y - 83};
+    if (keystroke == 'down') {this.y = this.y + 83};
+    if (keystroke == 'left') {this.x = this.x - 101};
+    if (keystroke == 'right') {this.x = this.x + 101};
     }
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
@@ -83,7 +99,7 @@ Player.prototype.handleInput = function() {
 
 var allEnemies = [];
 
-allEnemies.push(new Enemy()); //test bug
+allEnemies.push(new Enemy()); 
 allEnemies.push(new Enemy());
 allEnemies.push(new Enemy());
 
