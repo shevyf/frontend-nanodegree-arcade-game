@@ -3,9 +3,36 @@
 var squareHeight = 83,
     spriteZero = -28,
     squareWidth = 101,
-    charMargin = 20,
-    score = 0;
+    charMargin = 20;
 //start position for any player (not currently used)
+
+// this is a simple object that keeps track of scores, enables a win condition etc. The player resets itself when
+var score = {
+    points: 0,
+    message: "",
+    increase: function() {
+        score.points += 1;
+        score.message = "";
+        if (score.points > 9) {
+            score.message = "You win!";
+            score.points = 0
+        }
+    },
+    decrease: function() {
+        score.message = "";
+        if (score.points > 0) {
+            score.points -= 1
+        }
+    },
+    render: function() {
+        ctx.font = "30px Arial";
+        ctx.fillText(score.message, 20, 550);
+        ctx.fillText(score.points, 450, 550);
+        ctx.strokeText(score.message, 20, 550);
+        ctx.strokeText(score.points, 450, 550);
+    }
+}
+
 
 console.log("check");
 
@@ -22,10 +49,10 @@ var newLane = function () {
     }
 
 // the drawing of the board and movement of the pieces is determined by the width of the images (101) and height of the rows (83).
-// in addition, to get the pieces to land correctly on the squares, they need to have a y offset of -28 compared to the location of those pieces.
+// in addition, to get the pieces to land correctly on the squares, they need to have a y offset of -28 compared to the location of the squares.
 
 
-console.log("check2");  
+console.log("check2");
 // Enemies our player must avoid
 var Enemy = function() {
     // Variables applied to each of our instances go here,
@@ -122,7 +149,11 @@ Player.prototype.update = function() {
             }
         }
     )*/
-        return null
+        if (this.y < 0) {
+            score.increase();
+            this.x = 2*squareWidth;
+            this.y = spriteZero + squareHeight * 5; 
+        }
     };
 
 console.log("check6");
@@ -173,8 +204,7 @@ var collisionCheck = function(enemy, player) {
             // console.log("equal x");
             player.x = 2*squareWidth;
             player.y = spriteZero + squareHeight * 5; 
-            score += 1;
-            console.log(score);
+            score.decrease();
         }
     }
 }
