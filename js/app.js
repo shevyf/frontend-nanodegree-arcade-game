@@ -1,12 +1,17 @@
 // initiating some simple variables to allow tweaking and tailoring, and also to ensure precision in placing sprites
+// the drawing of the board and movement of the pieces is determined by the width of the images (101) and height of the rows (83).
+// in addition, to get the pieces to land correctly on the squares, they need to have a y offset of -28 compared to the location of the squares.
 
-var boardSize = {x:8, y:11}; //Important: for all the placing of sprites the board is effectively 10.
-
-var squareHeight = 83,
+// Important: for all the placing of sprites the board is effectively 10 as an additional row is added to make the top of the board tidy.
+// TODO: link this object into the engine. Might not be worth it as the layout of the board still have to include the list of images per row.
+// Might be worth having a level object that holds all of the board settings.
+var boardSize = {x:8, y:11},
+    squareHeight = 83,
     spriteZero = -28,
     squareWidth = 101,
     charMargin = 20;
 
+// calculate the normal player starting position based on the values above.
 var startX = Math.floor(boardSize.x / 2) * squareWidth;
 var startY = spriteZero + (squareHeight * (boardSize.y-2));
 
@@ -39,32 +44,32 @@ var score = {
     }
 }
 
-
-console.log("check1");
-
-//function to return a random speed
+// function to return a random speed
+// argument 'direction' should be 1 for right and -1 for left
 var newSpeed = function (direction) {
-    return (150 + Math.random() * 230) * direction //direction shoulld be 1 for right and -1 for left
-    }
+    return (150 + Math.random() * 230) * direction 
+}
 
-//funtion to return random lane
+//funtion to return random lane. Argument 'lanes' should be either 'top' for the top three lanes, or 'bottom' for the bottom three.
 var newLane = function (lanes) {
     if (lanes == "top") {
         return spriteZero + squareHeight + (Math.floor(Math.random() * 3) * squareHeight)
-    } else { return spriteZero + squareHeight + ((Math.floor(Math.random() * 3) + 4) * squareHeight)
+    } 
+    else { 
+        return spriteZero + squareHeight + ((Math.floor(Math.random() * 3) + 4) * squareHeight)
     }
 }
-
-// the drawing of the board and movement of the pieces is determined by the width of the images (101) and height of the rows (83).
-// in addition, to get the pieces to land correctly on the squares, they need to have a y offset of -28 compared to the location of the squares.
-
-console.log("check2");
 
 // Enemies our player must avoid
 var Enemy = function(lanes, direction) {
     // Variables applied to each of our instances go here,
     // we've provided one for you to get started
 
+    // lanes and direction are added to allow bugs to be placed in the correct formation in current the 2-road setup.
+    // lanes are top or bottom, which lets the randomise function place them into their correct group when spawning or leaving the screen.
+    // The lanes value is also added to a string to corectly select the bug image that faces the right way.
+    // direction is either 1 or -1, and is used as a multiplier for the velocity to make the bugs go the other way
+    // TODO: since lanes and direction are explicitly linked, reduce this to one value. Possibly.
     this.lanes = lanes;
     this.direction = direction;
     
@@ -85,8 +90,6 @@ var Enemy = function(lanes, direction) {
         
 };
 
-console.log("check3");
-
 // Update the enemy's position, required method for game
 // Parameter: dt, a time delta between ticks
 Enemy.prototype.update = function(dt) {
@@ -96,10 +99,8 @@ Enemy.prototype.update = function(dt) {
     
     // movement is determined by each enemy's velocity times the dt value to compensate for system run speed.
     // need to make sure a value is passed here or else undefined will be returned.
-    var move = this.vel;
-    if (dt != null) {
-        var move = this.vel * dt; // not yet implemented dt so this will help me compensate for that.
-    }
+    var move = this.vel * dt; 
+
     // movement gets added to the x position, however if this results in the bug 
     // moving off the screen, it should go back to the other side, and choose
     // a random lane to start in. It should also change it's speed to between 150 and 350
@@ -116,12 +117,9 @@ Enemy.prototype.update = function(dt) {
     }
 }
 
-console.log("check4");
-
 // Draw the enemy on the screen, required method for game
 Enemy.prototype.render = function() {
     ctx.save();
-    // ctx.scale(this.direction, 1);
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
     ctx.restore()
 }
@@ -130,52 +128,25 @@ Enemy.prototype.render = function() {
 // This class requires an update(), render() and
 // a handleInput() method.
 
-// player always starts in the same place, but that location 
-// changes so it can't be part of the prototype object.
-// it is rendered the same way as the Enemy, but I don't think 
-// that's a good enough reason to make it a subclass.
+// changed to the horn girl image becuase it's cooler.
 var Player = function() {
-
     this.sprite = 'images/char-horn-girl.png';
     this.x = startX;
     this.y = startY; 
+}
 
-    }
-    
-console.log("check5");
-    
 Player.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
-    }
+}
     
-    // check for collisions and winning; movement is
-    // handled by handleInput. Sprite is narrower than bug; need to compensate for that when measuring collision.
-    // problem: if i try to use allEnemies.forEach, suddenly this refers to allEnemies instead of the player
-    // Do I solve this by putting the update function in the enemy update, or do I write a seperate collision function? Can I pass this as an arguement to a function?
-    // probably best to have a collision function in the engine and apply it as Collision(enemy.y, player.y) under the general update.
+    // check for winning; movement is handled by handleInput. 
 Player.prototype.update = function() {
-    /* allEnemies.forEach(function(enemy) {
-        // console.log(this.y);
-        if (this.y == enemy.y) {
-            // console.log("equal y " + enemy.y);
-            if ((this.x < enemy.x + squareWidth - charMargin) && (this.x > enemy.x - squareWidth + charMargin)) {
-                // console.log("equal x");
-                this.x = 2*squareWidth;
-                this.y = spriteZero + squareHeight * 5; 
-                score += 1;
-                console.log(score);
-                }
-            }
-        }
-    )*/
-        if (this.y < 0) {
-            score.increase();
-            this.x = startX;
-            this.y = startY; 
-        }
-    };
-
-console.log("check6");
+    if (this.y < 0) {
+        score.increase();
+        this.x = startX;
+        this.y = startY; 
+    }
+};
 
     // handleInput adds or subtracts from x and y based on input, but also will not let the sprite move off the board.
 Player.prototype.handleInput = function(keystroke) {
@@ -183,36 +154,24 @@ Player.prototype.handleInput = function(keystroke) {
     if (keystroke == 'down' && this.y < 719) {this.y = this.y + 83};
     if (keystroke == 'left' && this.x > 0) {this.x = this.x - 101};
     if (keystroke == 'right' && this.x < (squareWidth * 7)) {this.x = this.x + 101};
-    console.log("Player");
-    console.log(this.x);
-    console.log(this.y);
     }
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
 // Place the player object in a variable called player
 
-console.log("check7");
-
 var allEnemies = [];
 
+// using this loop to allow number of enemies spawned to be changed easily.
 for (i = 0; i < 4; i++) { 
     allEnemies.push(new Enemy("top", 1)); 
     allEnemies.push(new Enemy("bottom", -1));
 };
-
-// allEnemies.push(new Enemy("top", 1)); 
-// allEnemies.push(new Enemy("top", 1)); 
-
-// allEnemies.push(new Enemy("bottom", -1));
-// allEnemies.push(new Enemy("bottom", -1));
 
 // when instantiating the enemies, they should be given a set value from one of the 3 lanes
 // for y, and a random value between 0 and canvas.width for their starting point.
 // Unlike normal frogger, the bare minimum rules for this game do not require groups
 // of enemies moving together, and they can overrun each other.
 var player = new Player();
-
-console.log("check8");
 
 // This listens for key presses and sends the keys to your
 // Player.handleInput() method. You don't need to modify this.
@@ -228,35 +187,14 @@ document.addEventListener('keyup', function(e) {
 });
 
 // this was necessary because trying to put a this.y inside a allEnemies.forEach results in the this referring to allEnemies. Instead,
-// this is called during the allEnemies check so that it can refer to the enemy and the player directly.
+// this is called during the allEnemies update so that it can refer to the enemy and the player directly. Sprite is narrower than 
+// bug; need to compensate for that when measuring collision.
 var collisionCheck = function(enemy, player) {
     if (player.y == enemy.y) {
-        // console.log("equal y " + enemy.y);
         if ((player.x < enemy.x + squareWidth - charMargin) && (player.x > enemy.x - squareWidth + charMargin)) {
-            // console.log("equal x");
             player.x = startX;
             player.y = startY; 
             score.decrease();
         }
     }
 }
-
-/* Addtionnal features:
-
-1. player select screen
-    to do this, the reset() function would need to be used. draw a background, then draw the 5 characters, simplest way would be to label them with numbers. would need to 
-    add additional keybind handling, which would then initiate a Player object with the correct .sprite value. Load sprite image in this step rather than in init...?
-2. Collect gems, use special abilities
-    Gems would need to be a special Gem object to handle placing, collecting, rendering. But different abilities... 
-    - teleport gem
-    - double point gem
-    - shield gem
-    - ghost gem
-3. Lives instead of negative points
-    simple enough. Random stars would give extra lives potentially?
-4. larger more complex field
-    2 sets of lanes, bugs go in different directions. minimum number of bugs on each side
-5. impassible objects
-    rocks - place in a central lane so you don't have to worry about the bugs moving past them
-    
-    */
