@@ -24,13 +24,13 @@ var score = {
         score.message = "";
         if (score.points > 9) {
             score.message = "You win!";
-            score.points = 0
+            score.points = 0;
         }
     },
     decrease: function() {
         score.message = "";
         if (score.points > 0) {
-            score.points -= 1
+            score.points -= 1;
         }
     },
     render: function() {
@@ -42,23 +42,23 @@ var score = {
         ctx.strokeText(score.message, 20, 750);
         ctx.strokeText(score.points, 753, 750);
     }
-}
+};
 
 // function to return a random speed
 // argument 'direction' should be 1 for right and -1 for left
 var newSpeed = function (direction) {
-    return (150 + Math.random() * 230) * direction 
-}
+    return (150 + Math.random() * 230) * direction;
+};
 
 //funtion to return random lane. Argument 'lanes' should be either 'top' for the top three lanes, or 'bottom' for the bottom three.
 var newLane = function (lanes) {
     if (lanes == "top") {
-        return spriteZero + squareHeight + (Math.floor(Math.random() * 3) * squareHeight)
+        return spriteZero + squareHeight + (Math.floor(Math.random() * 3) * squareHeight);
     } 
     else { 
-        return spriteZero + squareHeight + ((Math.floor(Math.random() * 3) + 4) * squareHeight)
+        return spriteZero + squareHeight + ((Math.floor(Math.random() * 3) + 4) * squareHeight);
     }
-}
+};
 
 // Enemies our player must avoid
 var Enemy = function(lanes, direction) {
@@ -108,21 +108,21 @@ Enemy.prototype.update = function(dt) {
     if (this.x > 808) {
         this.x = -101;
         this.y = newLane(this.lanes);
-        this.vel = newSpeed(this.direction) 
-    };
+        this.vel = newSpeed(this.direction);
+    }
     if (this.x < -101) {
         this.x = 808;
         this.y = newLane(this.lanes);
-        this.vel = newSpeed(this.direction) 
+        this.vel = newSpeed(this.direction);
     }
-}
+};
 
 // Draw the enemy on the screen, required method for game
 Enemy.prototype.render = function() {
     ctx.save();
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
-    ctx.restore()
-}
+    ctx.restore();
+};
 
 // Now write your own player class
 // This class requires an update(), render() and
@@ -133,11 +133,11 @@ var Player = function() {
     this.sprite = 'images/char-horn-girl.png';
     this.x = startX;
     this.y = startY; 
-}
+};
 
 Player.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
-}
+};
     
     // check for winning; movement is handled by handleInput. 
 Player.prototype.update = function() {
@@ -150,11 +150,11 @@ Player.prototype.update = function() {
 
     // handleInput adds or subtracts from x and y based on input, but also will not let the sprite move off the board.
 Player.prototype.handleInput = function(keystroke) {
-    if (keystroke == 'up' && this.y > spriteZero) {this.y = this.y - 83};
-    if (keystroke == 'down' && this.y < 719) {this.y = this.y + 83};
-    if (keystroke == 'left' && this.x > 0) {this.x = this.x - 101};
-    if (keystroke == 'right' && this.x < (squareWidth * 7)) {this.x = this.x + 101};
-    }
+    if (keystroke == 'up' && this.y > spriteZero) {this.y = this.y - 83;}
+    if (keystroke == 'down' && this.y < 719) {this.y = this.y + 83;}
+    if (keystroke == 'left' && this.x > 0) {this.x = this.x - 101;}
+    if (keystroke == 'right' && this.x < (squareWidth * 7)) {this.x = this.x + 101;}
+};
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
 // Place the player object in a variable called player
@@ -165,7 +165,7 @@ var allEnemies = [];
 for (i = 0; i < 4; i++) { 
     allEnemies.push(new Enemy("top", 1)); 
     allEnemies.push(new Enemy("bottom", -1));
-};
+}
 
 // when instantiating the enemies, they should be given a set value from one of the 3 lanes
 // for y, and a random value between 0 and canvas.width for their starting point.
@@ -197,4 +197,4 @@ var collisionCheck = function(enemy, player) {
             score.decrease();
         }
     }
-}
+};

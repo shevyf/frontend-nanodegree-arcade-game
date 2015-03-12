@@ -1,7 +1,9 @@
 frontend-nanodegree-arcade-game
 ===============================
 
-This is a Frogger clone that I'm working on for my Udacity course. Use arrow keys to move the player icon around, avoid enemy bugs and make it to the water to score. Reach 10 points to win!
+This is a Frogger clone that I'm working on for my Udacity course. 
+
+Open index.html to start playing. Use arrow keys to move the player icon around, avoid enemy bugs and make it to the water to score. Reach 10 points to win!
 
 There are several items on my to-do list for this game:
 
